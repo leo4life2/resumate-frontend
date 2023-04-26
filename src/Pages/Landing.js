@@ -25,7 +25,7 @@ const Landing = () => {
             A smarter way to connect job seekers and recruiters<br></br> through AI-driven resume analysis
           </h3>
           <div className="flex justify-center">
-            <button className="bg-indigo-600 text-white text-3xl py-4 px-6 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <button className="bg-indigo-600 text-white text-3xl py-4 px-6 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300" onClick={() => navigate("/register")}>
               Sign up now
             </button>
           </div>
