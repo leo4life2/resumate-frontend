@@ -11,9 +11,6 @@ const Landing = () => {
           <img className="w-16 h-16" src={logo} alt='logo'></img>
           <h1 className="text-indigo-500 text-5xl font-semibold">Resumate</h1>
         </div>
-        <button className="bg-indigo-600 text-white text-3xl py-4 px-6 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300" onClick={() => navigate("/login")}>
-              Login
-        </button>
       </header>
 
       <main className="flex-grow flex items-center justify-center">
@@ -25,8 +22,8 @@ const Landing = () => {
             A smarter way to connect job seekers and recruiters<br></br> through AI-driven resume analysis
           </h3>
           <div className="flex justify-center">
-            <button className="bg-indigo-600 text-white text-3xl py-4 px-6 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300" onClick={() => navigate("/register")}>
-              Sign up now
+            <button className="bg-indigo-600 text-white text-3xl py-4 px-6 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300" onClick={() => navigate("/dashboard")}>
+              Login / Sign Up
             </button>
           </div>
         </div>
