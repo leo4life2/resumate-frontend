@@ -7,7 +7,7 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <header className="flex items-center justify-between p-4">
-        <div className="flex items-center space-x-2" onClick={() => navigate("/")}>
+        <div className="flex items-center space-x-2 py-1 pl-1" onClick={() => navigate("/")}>
           <img className="w-16 h-16" src={logo} alt='logo'></img>
           <h1 className="text-indigo-500 text-5xl font-semibold">Resumate</h1>
         </div>
