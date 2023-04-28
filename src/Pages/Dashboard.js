@@ -34,13 +34,54 @@ const Dashboard = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (file) {
-      console.log('Uploading:', file);
-      alert('File uploaded successfully');
+      try {
+        const res = await axios.put("https://jrn8nltaqj.execute-api.us-east-1.amazonaws.com/prod/resumes", file, {
+          headers: {
+            Authorization: (await Auth.currentSession()).getIdToken().getJwtToken(),
+            'Content-Type': 'application/pdf',
+            filename : file.name,
+          },
+        })
+        if (res.status !== 200) {
+          alert('Error uploading file');
+          console.log(res);
+          return;
+        } else {
+          console.log(res);
+          alert('File uploaded successfully');
+          setFile(null);
+          setFileName('No file chosen');
+        }
+      } catch (err) {
+        alert('Error uploading file');
+        console.log(err);
+      }
     } else {
       alert('Invalid file format. Please select a PDF.');
+    }
+  };
+
+  const handleGetMatches = async () => {
+    try {
+      const res = await axios.post("https://jrn8nltaqj.execute-api.us-east-1.amazonaws.com/prod/resumes/search", null, {
+        headers: {
+          Authorization: (await Auth.currentSession()).getIdToken().getJwtToken(),
+        },
+      })
+      if (res.status !== 200) {
+        alert('Error getting matches');
+        console.log(res);
+        return;
+      } else {
+        console.log(res);
+        alert('Matches retrieved successfully');
+      }
+    } catch (err) {
+      alert('Error getting matches');
+      console.log(err);
     }
   };
 
@@ -105,6 +146,12 @@ const Dashboard = () => {
               Upload
             </button>
           </form>
+        </div>
+        <div className="col-span-2 ml-6">
+          <h1 className="text-2xl font-bold mb-4">Getting Matches</h1>
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleGetMatches}>
+            Get Matches
+          </button>
         </div>
       </div>
     </div>
