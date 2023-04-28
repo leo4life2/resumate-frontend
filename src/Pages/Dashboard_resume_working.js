@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Amplify, Auth } from 'aws-amplify';
 import { withAuthenticator, useAuthenticator } from '@aws-amplify/ui-react';
-import Chat from '../Components/Chat';
 import '@aws-amplify/ui-react/styles.css';
 import axios from 'axios';
 import logo from '../Assets/logo.png'
@@ -18,7 +17,6 @@ const Dashboard = () => {
   const [fileName, setFileName] = useState('No file chosen');
   const [matches, setMatches] = useState([]);
   const [disabledButtons, setDisabledButtons] = useState({});
-  const [chatrooms, setChatrooms] = useState([]);
 
   const sendInvitation = async (matchID) => {
     return;
@@ -43,8 +41,6 @@ const Dashboard = () => {
       console.log((await Auth.currentSession()).getIdToken().getJwtToken())
     }
     getUser().then(() => { console.log(user) })
-
-    // Get Chatroom here
   }, [user])
 
   const handleFileChange = (e) => {
@@ -170,19 +166,6 @@ const Dashboard = () => {
               Upload
             </button>
           </form>
-
-          <div className="mt-8">
-            <h1 className="text-2xl font-bold mb-4">Your Chatrooms</h1>
-            <div className="flex flex-col space-y-4">
-              {chatrooms.map((chatroom) => (
-                <div key={chatroom.chatroomID} className="p-4 border rounded shadow flex justify-between items-center">
-                  <div>
-                    <h1 className="text-xl font-bold">{chatroom.chatroomID}</h1>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
         <div className="col-span-2 ml-6">
           <h1 className="text-2xl font-bold mb-4">Getting Matches</h1>
@@ -206,9 +189,6 @@ const Dashboard = () => {
                 </button>
               </div>
             ))}
-          </div>
-          <div className="mt-8">
-            {/* <Chat room_id={`arn:aws:ivschat:us-east-1:670020256590:room/NWHYUr3g7k0p`} chat_token={`AQICAHgm5DC1V25pBVEhXdu--DOMvHAxl47LlIVxHqc_j6xXLgE4OMZ3JxlxGToWx5LPJq9VAAABqDCCAaQGCSqGSIb3DQEHBqCCAZUwggGRAgEAMIIBigYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAzNEubd1XTS6VzezgcCARCAggFbDKqcaQtF_luiyKum5nbLpMc90PXoR2WnpUUYrzHgqXNHZXXbvTAN6nWApGXwlTVdLzOd6k5LCCUPumlqYkErV0Btd1pPw3AoId0E08kcv1bT1S4XOicWeye2FLgLgyP1pHGQz6qrmr40SJpDGiGcq9qXgN5H-82Zusf2dQP06qeQLf9g09xOFki3nmX-gZRCG9Ka3aCzq_OUpCaceS5bFjOJk66ePqUNDCQ62WKubucxXafG6OsA7jo5lUtfeF6y-PwH_mB9C43O1KRXtJ0CwnPpgEv1TieLP6dUxB5epHqneZiENq9bCh22KZ3nH-CMjFiFOWjBFpCXzWpa_kqlk-C21jmTq9NNFHd3LomQMNb5M0YvGu_prx_GSMzsgqV-AKJj2qMw2AxkcJ79Wv5XJWc59PTZ1vNL5NmK7dYMU8ws2g4v0huBXaLV65M3KLDx7sevDf1RbTxm-0Q!#0`}/> */}
           </div>
         </div>
       </div>

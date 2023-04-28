@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IVSChatRoom } from 'amazon-ivs-chat-messaging';
+import { ChatRoom } from 'amazon-ivs-chat-messaging';
 
 const IVSChat = ({ chatRoomId, chatToken }) => {
   const [messages, setMessages] = useState([]);
@@ -13,7 +13,7 @@ const IVSChat = ({ chatRoomId, chatToken }) => {
       text: message,
     };
 
-    IVSChatRoom.sendMessage(chatRoomId, chatToken, newMessage, (error) => {
+    ChatRoom.sendMessage(chatRoomId, chatToken, newMessage, (error) => {
       if (error) {
         console.error(error);
       }
