@@ -15,14 +15,33 @@ const Dashboard = () => {
 
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState('No file chosen');
+  const [matches, setMatches] = useState([]);
+  const [disabledButtons, setDisabledButtons] = useState({});
+
+  const sendInvitation = async (matchID) => {
+    return;
+  };
+
+  const handleButtonClick = async (matchID) => {
+    try {
+      await sendInvitation(matchID);
+      alert('Invitation sent successfully');
+      setDisabledButtons((prevDisabledButtons) => ({
+        ...prevDisabledButtons,
+        [matchID]: true,
+      }));
+    } catch (error) {
+      console.error('Failed to send invitation:', error);
+      alert('Failed to send invitation');
+    }
+  };
 
   useEffect(() => {
     const getUser = async () => {
       console.log((await Auth.currentSession()).getIdToken().getJwtToken())
     }
     getUser().then(() => { console.log(user) })
-
-  })
+  }, [user])
 
   const handleFileChange = (e) => {
     if (e.target.files[0] && e.target.files[0].type === 'application/pdf') {
@@ -42,7 +61,7 @@ const Dashboard = () => {
           headers: {
             Authorization: (await Auth.currentSession()).getIdToken().getJwtToken(),
             'Content-Type': 'application/pdf',
-            filename : file.name,
+            filename: file.name,
           },
         })
         if (res.status !== 200) {
@@ -77,6 +96,7 @@ const Dashboard = () => {
         return;
       } else {
         console.log(res);
+        setMatches(res.data.data);
         alert('Matches retrieved successfully');
       }
     } catch (err) {
@@ -108,14 +128,14 @@ const Dashboard = () => {
         </span>
         <button
           className="bg-indigo-600 text-white py-2 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300"
-          onClick={() => {signOut(); navigate("/")}}
+          onClick={() => { signOut(); navigate("/") }}
         >
           Logout
         </button>
       </nav>
       <div className="bg-white p-8 mt-8 mx-8 rounded-t-3xl shadow-lg grid grid-cols-3 flex-grow">
         <div>
-          <h1 className="text-2xl font-bold mb-4">Resume Upload</h1>
+          <h1 className="text-2xl font-bold mb-4">Resume Upload / Update</h1>
           <form onSubmit={handleSubmit} className="w-full max-w-md">
             <div
               onDrop={onDrop}
@@ -152,6 +172,24 @@ const Dashboard = () => {
           <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleGetMatches}>
             Get Matches
           </button>
+          <div>
+            {matches.map((match) => (
+              <div key={match.userID} className="mt-4 p-4 border rounded shadow flex justify-between items-center">
+                <div>
+                  <h1 className="text-xl font-bold">{match.userID}</h1>
+                  <p className="text-lg">Match Rate: {(match.score * 100).toFixed(2)} %</p>
+                </div>
+                <button
+                  className={`px-4 py-2 rounded text-white ${disabledButtons[match.userID] ? 'bg-gray-500' : 'bg-blue-500'
+                    }`}
+                  disabled={disabledButtons[match.userID]}
+                  onClick={() => handleButtonClick(match.userID)}
+                >
+                  {disabledButtons[match.userID] ? 'Already Invited' : 'Invite to Chat'}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
