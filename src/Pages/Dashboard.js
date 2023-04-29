@@ -208,7 +208,8 @@ const Dashboard = () => {
             ))}
           </div>
           <div className="mt-8">
-            {/* <Chat room_id={`arn:aws:ivschat:us-east-1:670020256590:room/NWHYUr3g7k0p`} chat_token={`AQICAHgm5DC1V25pBVEhXdu--DOMvHAxl47LlIVxHqc_j6xXLgE4OMZ3JxlxGToWx5LPJq9VAAABqDCCAaQGCSqGSIb3DQEHBqCCAZUwggGRAgEAMIIBigYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAzNEubd1XTS6VzezgcCARCAggFbDKqcaQtF_luiyKum5nbLpMc90PXoR2WnpUUYrzHgqXNHZXXbvTAN6nWApGXwlTVdLzOd6k5LCCUPumlqYkErV0Btd1pPw3AoId0E08kcv1bT1S4XOicWeye2FLgLgyP1pHGQz6qrmr40SJpDGiGcq9qXgN5H-82Zusf2dQP06qeQLf9g09xOFki3nmX-gZRCG9Ka3aCzq_OUpCaceS5bFjOJk66ePqUNDCQ62WKubucxXafG6OsA7jo5lUtfeF6y-PwH_mB9C43O1KRXtJ0CwnPpgEv1TieLP6dUxB5epHqneZiENq9bCh22KZ3nH-CMjFiFOWjBFpCXzWpa_kqlk-C21jmTq9NNFHd3LomQMNb5M0YvGu_prx_GSMzsgqV-AKJj2qMw2AxkcJ79Wv5XJWc59PTZ1vNL5NmK7dYMU8ws2g4v0huBXaLV65M3KLDx7sevDf1RbTxm-0Q!#0`}/> */}
+            <Chat room_id={"arn:aws:ivschat:us-east-1:670020256590:room/NWHYUr3g7k0p"} chat_token={
+              "AQICAHgm5DC1V25pBVEhXdu--DOMvHAxl47LlIVxHqc_j6xXLgHKpyRTQjoS7GVb03scBQwdAAABqDCCAaQGCSqGSIb3DQEHBqCCAZUwggGRAgEAMIIBigYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAyRIMhAedyxwPNmZyICARCAggFbYv1u6GUkItiolsj5Uek0zwR1i4c7WXHOcQiQp3BnAFxPFVItA8-ePp1abiKR-Bv8SFHd10AXrdcMQd5n-_avGee8uSxvtN2UB1_LjSqgpMCIh8yHI6PHHcEzDLV7gAZDWkdu-hOmz-mWtOffr4OhPvZbeGzcT9G1uhaIg-QMr5Q7HWq6nX4b5cNiP8LUv--RfOR1kB1Jy8KOIUiIvPm2vJO8FGE4w_lPjjfRjy1fHOJfiTr3UiyGaaS88fOgD2do625T-Vq995Zx1RGw1PMczFbN9goCLrAkZqv63APNleA67C8dzh8GYskXWwMiownu10L4obw_O14MCz6Q8atcfcKopKbU2_VQJtmAqCiPJdeHF61lGWMyZTQTVihQnHp5hRK50NepEUDiXhI8azylJ8twyrRGq5qfwc6xnx-_ID8Qv_fX7Z1xlrxUeFMj-q1n63SQSbkngcdkl5k!#0"} s_exp={"2023-04-29T17:37:44+00:00"} t_exp={"2023-04-29T17:37:44+00:00"}/>
           </div>
         </div>
       </div>
