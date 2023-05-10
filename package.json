@@ -10,6 +10,7 @@
     "amazon-ivs-chat-messaging": "^1.1.1",
     "aws-amplify": "^5.1.3",
     "axios": "^1.3.6",
+    "pdf-lib": "^1.17.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.10.0",
