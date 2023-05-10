@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Amplify, Auth } from 'aws-amplify';
+import { PDFDocument } from 'pdf-lib';
 import { withAuthenticator, useAuthenticator } from '@aws-amplify/ui-react';
 import Chat from '../Components/Chat';
 import '@aws-amplify/ui-react/styles.css';
@@ -81,13 +82,29 @@ const Dashboard = () => {
     e.preventDefault();
     if (file) {
       try {
-        const res = await axios.put("https://jrn8nltaqj.execute-api.us-east-1.amazonaws.com/prod/resumes", file, {
+        // Read the input PDF file
+        const inputPdfBytes = await file.arrayBuffer();
+        const inputPdfDoc = await PDFDocument.load(inputPdfBytes);
+  
+        // Create a new PDF with only the first page
+        const outputPdfDoc = await PDFDocument.create();
+        const [firstPage] = await outputPdfDoc.copyPages(inputPdfDoc, [0]);
+        outputPdfDoc.addPage(firstPage);
+  
+        // Serialize the output PDF
+        const outputPdfBytes = await outputPdfDoc.save();
+  
+        // Convert the output PDF to a Blob object
+        const trimmedFile = new Blob([outputPdfBytes], { type: 'application/pdf' });
+  
+        const res = await axios.put("https://jrn8nltaqj.execute-api.us-east-1.amazonaws.com/prod/resumes", trimmedFile, {
           headers: {
             Authorization: (await Auth.currentSession()).getIdToken().getJwtToken(),
             'Content-Type': 'application/pdf',
             filename: user.attributes.email + '.pdf',
           },
-        })
+        });
+  
         if (res.status !== 200) {
           alert('Error uploading file');
           console.log(res);
