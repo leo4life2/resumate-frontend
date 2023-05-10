@@ -35,15 +35,7 @@ const Dashboard = () => {
   };
 
   const handleInviteButtonClick = async () => {
-    try {
-      const promises = selectedUsers.map((userID) => sendInvitation(userID));
-      await Promise.all(promises);
-      alert('Invitations sent successfully');
-      setSelectedUsers([]);
-    } catch (error) {
-      console.error('Failed to send invitations:', error);
-      alert('Failed to send invitations');
-    }
+    console.log(selectedUsers);
   };
 
   useEffect(() => {
@@ -93,7 +85,7 @@ const Dashboard = () => {
           headers: {
             Authorization: (await Auth.currentSession()).getIdToken().getJwtToken(),
             'Content-Type': 'application/pdf',
-            filename: file.name,
+            filename: user.attributes.email + '.pdf',
           },
         })
         if (res.status !== 200) {
@@ -217,7 +209,7 @@ const Dashboard = () => {
               type="submit"
               className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
-              Upload
+              Upload / Update
             </button>
           </form>
 
@@ -226,9 +218,9 @@ const Dashboard = () => {
 
             <div className="flex flex-col space-y-4">
               {chatrooms.map((chatroom) => (
-                <div key={chatroom} className="p-4 border rounded shadow flex justify-between items-center cursor-pointer bg-indigo-500 hover:shadow-xl">
+                <div key={chatroom} className="p-4 border rounded shadow flex justify-between items-center cursor-pointer bg-blue-500 hover:shadow-lg hover:bg-blue-600">
                   <div>
-                    <h3 className="text-xl font-bold text-white">Chatroom {chatroom.split("/")[1]}</h3>
+                    <h3 className="text-lg font-bold text-white">Chatroom {chatroom.split("/")[1]}</h3>
                   </div>
                 </div>
               ))}
