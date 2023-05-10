@@ -259,16 +259,18 @@ const Dashboard = () => {
               }
               <div>
                 {matches.map((match) => (
-                  <div key={match.userID} className="mt-4 p-4 border rounded shadow flex justify-between items-center">
+                  <div key={match.username} className="mt-4 p-4 border rounded shadow flex justify-between items-center">
                     <div className="flex items-center">
                       <input
                         type="checkbox"
-                        checked={selectedUsers.includes(match.userID)}
-                        onChange={(e) => handleCheckboxChange(e, match.userID)}
+                        checked={selectedUsers.includes(match.username)}
+                        onChange={(e) => handleCheckboxChange(e, match.username)}
                         className="mr-4"
                       />
                       <div>
-                        <h1 className="text-xl font-bold">{match.userID}</h1>
+                        <a href={`https://cc-proj-resume-bucket.s3.amazonaws.com/${match.username}.pdf`} target="_blank" rel="noopener noreferrer">
+                          <h1 className="text-xl font-bold underline text-blue-600">{match.username}</h1>
+                        </a>
                         <p className="text-lg">Match Rate: {(match.score * 100).toFixed(2)} %</p>
                       </div>
                     </div>
