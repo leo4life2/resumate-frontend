@@ -17,8 +17,8 @@ const Dashboard = () => {
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState('No file chosen');
   const [matches, setMatches] = useState([]);
-  const [disabledButtons, setDisabledButtons] = useState({});
   const [chatrooms, setChatrooms] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [curChat, setCurChat] = useState('');
 
@@ -26,17 +26,23 @@ const Dashboard = () => {
     return;
   };
 
-  const handleButtonClick = async (matchID) => {
+  const handleCheckboxChange = (e, userID) => {
+    if (e.target.checked) {
+      setSelectedUsers([...selectedUsers, userID]);
+    } else {
+      setSelectedUsers(selectedUsers.filter((id) => id !== userID));
+    }
+  };
+
+  const handleInviteButtonClick = async () => {
     try {
-      await sendInvitation(matchID);
-      alert('Invitation sent successfully');
-      setDisabledButtons((prevDisabledButtons) => ({
-        ...prevDisabledButtons,
-        [matchID]: true,
-      }));
+      const promises = selectedUsers.map((userID) => sendInvitation(userID));
+      await Promise.all(promises);
+      alert('Invitations sent successfully');
+      setSelectedUsers([]);
     } catch (error) {
-      console.error('Failed to send invitation:', error);
-      alert('Failed to send invitation');
+      console.error('Failed to send invitations:', error);
+      alert('Failed to send invitations');
     }
   };
 
@@ -60,7 +66,7 @@ const Dashboard = () => {
           return;
         } else {
           console.log(res);
-          setChatrooms(res.data);
+          setChatrooms(res.data.data);
         }
       } catch (err) {
         console.log(err);
@@ -217,14 +223,12 @@ const Dashboard = () => {
 
           <div className="mt-8">
             <h1 className="text-2xl font-bold mb-4">Your Chatrooms</h1>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={createChatroom}>
-                Create Chatroom
-            </button>
+
             <div className="flex flex-col space-y-4">
               {chatrooms.map((chatroom) => (
-                <div key={chatroom.chatroomID} className="p-4 border rounded shadow flex justify-between items-center">
+                <div key={chatroom} className="p-4 border rounded shadow flex justify-between items-center cursor-pointer bg-indigo-500 hover:shadow-xl">
                   <div>
-                    <h1 className="text-xl font-bold">{chatroom.chatroomID}</h1>
+                    <h3 className="text-xl font-bold text-white">Chatroom {chatroom.split("/")[1]}</h3>
                   </div>
                 </div>
               ))}
@@ -235,27 +239,42 @@ const Dashboard = () => {
           curChat === '' ?
             <div className="col-span-2 ml-6">
               <h1 className="text-2xl font-bold mb-4">Getting Matches</h1>
-              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleGetMatches}>
-                Get Matches
-              </button>
+              {
+                matches.length === 0 &&
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  onClick={handleGetMatches}
+                >
+                  Get Matches
+                </button>
+              }
               <div>
                 {matches.map((match) => (
                   <div key={match.userID} className="mt-4 p-4 border rounded shadow flex justify-between items-center">
-                    <div>
-                      <h1 className="text-xl font-bold">{match.userID}</h1>
-                      <p className="text-lg">Match Rate: {(match.score * 100).toFixed(2)} %</p>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedUsers.includes(match.userID)}
+                        onChange={(e) => handleCheckboxChange(e, match.userID)}
+                        className="mr-4"
+                      />
+                      <div>
+                        <h1 className="text-xl font-bold">{match.userID}</h1>
+                        <p className="text-lg">Match Rate: {(match.score * 100).toFixed(2)} %</p>
+                      </div>
                     </div>
-                    <button
-                      className={`px-4 py-2 rounded text-white ${disabledButtons[match.userID] ? 'bg-gray-500' : 'bg-blue-500'
-                        }`}
-                      disabled={disabledButtons[match.userID]}
-                      onClick={() => handleButtonClick(match.userID)}
-                    >
-                      {disabledButtons[match.userID] ? 'Already Invited' : 'Invite to Chat'}
-                    </button>
                   </div>
                 ))}
               </div>
+              {
+                selectedUsers.length > 0 &&
+                <button
+                  className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  onClick={handleInviteButtonClick}
+                >
+                  Invite to Chat
+                </button>
+              }
             </div>
             :
             <div className="col-span-2 ml-6">
