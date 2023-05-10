@@ -19,6 +19,8 @@ const Dashboard = () => {
   const [matches, setMatches] = useState([]);
   const [disabledButtons, setDisabledButtons] = useState({});
   const [chatrooms, setChatrooms] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+  const [curChat, setCurChat] = useState('');
 
   const sendInvitation = async (matchID) => {
     return;
@@ -43,9 +45,29 @@ const Dashboard = () => {
       console.log((await Auth.currentSession()).getIdToken().getJwtToken())
     }
     getUser().then(() => { console.log(user) })
-
-    // Get Chatroom here
   }, [user])
+
+  useEffect(() => {
+    const getChatrooms = async () => {
+      try {
+        const res = await axios.get("https://jrn8nltaqj.execute-api.us-east-1.amazonaws.com/prod/chatroom/rooms", {
+          headers: {
+            Authorization: (await Auth.currentSession()).getIdToken().getJwtToken(),
+          },
+        })
+        if (res.status !== 200) {
+          console.log(res);
+          return;
+        } else {
+          console.log(res);
+          setChatrooms(res.data);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    getChatrooms();
+  }, [refresh]);
 
   const handleFileChange = (e) => {
     if (e.target.files[0] && e.target.files[0].type === 'application/pdf') {
@@ -105,6 +127,28 @@ const Dashboard = () => {
       }
     } catch (err) {
       alert('Error getting matches');
+      console.log(err);
+    }
+  };
+
+  const createChatroom = async () => {
+    try {
+      const res = await axios.post("https://jrn8nltaqj.execute-api.us-east-1.amazonaws.com/prod/chatroom/create", null, {
+        headers: {
+          Authorization: (await Auth.currentSession()).getIdToken().getJwtToken(),
+        },
+      })
+      if (res.status !== 200) {
+        alert('Error creating chatroom');
+        console.log(res);
+        return;
+      } else {
+        console.log(res);
+        alert('Chatroom created successfully');
+        setRefresh(!refresh);
+      }
+    } catch (err) {
+      alert('Error creating chatroom');
       console.log(err);
     }
   };
@@ -173,6 +217,9 @@ const Dashboard = () => {
 
           <div className="mt-8">
             <h1 className="text-2xl font-bold mb-4">Your Chatrooms</h1>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={createChatroom}>
+                Create Chatroom
+            </button>
             <div className="flex flex-col space-y-4">
               {chatrooms.map((chatroom) => (
                 <div key={chatroom.chatroomID} className="p-4 border rounded shadow flex justify-between items-center">
@@ -184,34 +231,40 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <div className="col-span-2 ml-6">
-          <h1 className="text-2xl font-bold mb-4">Getting Matches</h1>
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleGetMatches}>
-            Get Matches
-          </button>
-          <div>
-            {matches.map((match) => (
-              <div key={match.userID} className="mt-4 p-4 border rounded shadow flex justify-between items-center">
-                <div>
-                  <h1 className="text-xl font-bold">{match.userID}</h1>
-                  <p className="text-lg">Match Rate: {(match.score * 100).toFixed(2)} %</p>
-                </div>
-                <button
-                  className={`px-4 py-2 rounded text-white ${disabledButtons[match.userID] ? 'bg-gray-500' : 'bg-blue-500'
-                    }`}
-                  disabled={disabledButtons[match.userID]}
-                  onClick={() => handleButtonClick(match.userID)}
-                >
-                  {disabledButtons[match.userID] ? 'Already Invited' : 'Invite to Chat'}
-                </button>
+        {
+          curChat === '' ?
+            <div className="col-span-2 ml-6">
+              <h1 className="text-2xl font-bold mb-4">Getting Matches</h1>
+              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={handleGetMatches}>
+                Get Matches
+              </button>
+              <div>
+                {matches.map((match) => (
+                  <div key={match.userID} className="mt-4 p-4 border rounded shadow flex justify-between items-center">
+                    <div>
+                      <h1 className="text-xl font-bold">{match.userID}</h1>
+                      <p className="text-lg">Match Rate: {(match.score * 100).toFixed(2)} %</p>
+                    </div>
+                    <button
+                      className={`px-4 py-2 rounded text-white ${disabledButtons[match.userID] ? 'bg-gray-500' : 'bg-blue-500'
+                        }`}
+                      disabled={disabledButtons[match.userID]}
+                      onClick={() => handleButtonClick(match.userID)}
+                    >
+                      {disabledButtons[match.userID] ? 'Already Invited' : 'Invite to Chat'}
+                    </button>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <div className="mt-8">
-            <Chat room_id={"arn:aws:ivschat:us-east-1:670020256590:room/NWHYUr3g7k0p"} chat_token={
-              "AQICAHgm5DC1V25pBVEhXdu--DOMvHAxl47LlIVxHqc_j6xXLgHKpyRTQjoS7GVb03scBQwdAAABqDCCAaQGCSqGSIb3DQEHBqCCAZUwggGRAgEAMIIBigYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAyRIMhAedyxwPNmZyICARCAggFbYv1u6GUkItiolsj5Uek0zwR1i4c7WXHOcQiQp3BnAFxPFVItA8-ePp1abiKR-Bv8SFHd10AXrdcMQd5n-_avGee8uSxvtN2UB1_LjSqgpMCIh8yHI6PHHcEzDLV7gAZDWkdu-hOmz-mWtOffr4OhPvZbeGzcT9G1uhaIg-QMr5Q7HWq6nX4b5cNiP8LUv--RfOR1kB1Jy8KOIUiIvPm2vJO8FGE4w_lPjjfRjy1fHOJfiTr3UiyGaaS88fOgD2do625T-Vq995Zx1RGw1PMczFbN9goCLrAkZqv63APNleA67C8dzh8GYskXWwMiownu10L4obw_O14MCz6Q8atcfcKopKbU2_VQJtmAqCiPJdeHF61lGWMyZTQTVihQnHp5hRK50NepEUDiXhI8azylJ8twyrRGq5qfwc6xnx-_ID8Qv_fX7Z1xlrxUeFMj-q1n63SQSbkngcdkl5k!#0"} s_exp={"2023-04-29T17:37:44+00:00"} t_exp={"2023-04-29T17:37:44+00:00"}/>
-          </div>
-        </div>
+            </div>
+            :
+            <div className="col-span-2 ml-6">
+              <div className="mt-8">
+                <Chat room_id={"arn:aws:ivschat:us-east-1:670020256590:room/NWHYUr3g7k0p"} chat_token={
+                  "AQICAHgm5DC1V25pBVEhXdu--DOMvHAxl47LlIVxHqc_j6xXLgHKpyRTQjoS7GVb03scBQwdAAABqDCCAaQGCSqGSIb3DQEHBqCCAZUwggGRAgEAMIIBigYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAyRIMhAedyxwPNmZyICARCAggFbYv1u6GUkItiolsj5Uek0zwR1i4c7WXHOcQiQp3BnAFxPFVItA8-ePp1abiKR-Bv8SFHd10AXrdcMQd5n-_avGee8uSxvtN2UB1_LjSqgpMCIh8yHI6PHHcEzDLV7gAZDWkdu-hOmz-mWtOffr4OhPvZbeGzcT9G1uhaIg-QMr5Q7HWq6nX4b5cNiP8LUv--RfOR1kB1Jy8KOIUiIvPm2vJO8FGE4w_lPjjfRjy1fHOJfiTr3UiyGaaS88fOgD2do625T-Vq995Zx1RGw1PMczFbN9goCLrAkZqv63APNleA67C8dzh8GYskXWwMiownu10L4obw_O14MCz6Q8atcfcKopKbU2_VQJtmAqCiPJdeHF61lGWMyZTQTVihQnHp5hRK50NepEUDiXhI8azylJ8twyrRGq5qfwc6xnx-_ID8Qv_fX7Z1xlrxUeFMj-q1n63SQSbkngcdkl5k!#0"} s_exp={"2023-04-29T17:37:44+00:00"} t_exp={"2023-04-29T17:37:44+00:00"} />
+              </div>
+            </div>
+        }
       </div>
     </div>
   );

@@ -3,7 +3,11 @@ import { ChatRoom } from 'amazon-ivs-chat-messaging';
 
 const SendButton = ({ onPress, disabled }) => {
   return (
-    <button disabled={disabled} onClick={onPress}>
+    <button
+      disabled={disabled}
+      onClick={onPress}
+      className={`bg-blue-500 text-white font-semibold py-2 px-4 rounded ${disabled ? 'opacity-50' : 'hover:bg-blue-700'}`}
+    >
       Send
     </button>
   );
@@ -52,9 +56,16 @@ const Chat = ({ room_id, chat_token, s_exp, t_exp }) => {
   }, [room]);
 
   return (
-    <div>
-      <h4>Connection State: {connectionState}</h4>
-      <SendButton disabled={isSendDisabled} onPress={onMessageSend} />
+    <div className="container mx-auto px-4">
+      <h4 className="text-xl font-bold mb-4">Connection State: {connectionState}</h4>
+      <div className="flex items-center space-x-4">
+        <input
+          type="text"
+          className="w-full border border-gray-300 p-2 rounded-md focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+          placeholder="Type your message here..."
+        />
+        <SendButton disabled={isSendDisabled} onPress={onMessageSend} />
+      </div>
     </div>
   );
 }
