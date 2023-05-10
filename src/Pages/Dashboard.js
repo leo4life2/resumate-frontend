@@ -23,6 +23,12 @@ const Dashboard = () => {
   const [refresh, setRefresh] = useState(false);
   const [curChat, setCurChat] = useState('');
 
+  // Tokens
+  const [room_id, setRoomID] = useState('');
+  const [chat_token, setChatToken] = useState('');
+  const [s_exp, setSExp] = useState('');
+  const [t_exp, setTExp] = useState('');
+
   const sendInvitation = async (matchID) => {
     return;
   };
@@ -121,6 +127,30 @@ const Dashboard = () => {
       }
     } else {
       alert('Invalid file format. Please select a PDF.');
+    }
+  };
+
+  const handleGetTokens = async (roomID) => {
+    try {
+      const res = await axios.get("https://jrn8nltaqj.execute-api.us-east-1.amazonaws.com/prod/chatroom/" + roomID, {
+        headers: {
+          Authorization: (await Auth.currentSession()).getIdToken().getJwtToken(),
+      }
+      })
+      if (res.status !== 200) {
+        alert('Error getting tokens');
+        console.log(res);
+        return;
+      } else {
+        console.log(res);
+        setChatToken(res.data.token);
+        setSExp(res.data.s_exp);
+        setTExp(res.data.t_exp);
+        setCurChat(roomID);
+      }
+    } catch (err) {
+      alert('Error getting tokens');
+      console.log(err);
     }
   };
 
@@ -235,7 +265,7 @@ const Dashboard = () => {
 
             <div className="flex flex-col space-y-4">
               {chatrooms.map((chatroom) => (
-                <div key={chatroom} className="p-4 border rounded shadow flex justify-between items-center cursor-pointer bg-blue-500 hover:shadow-lg hover:bg-blue-600">
+                <div key={chatroom} className="p-4 border rounded shadow flex justify-between items-center cursor-pointer bg-blue-500 hover:shadow-lg hover:bg-blue-600" onClick={() => handleGetTokens(chatroom.split("/")[1])}>
                   <div>
                     <h3 className="text-lg font-bold text-white">Chatroom {chatroom.split("/")[1]}</h3>
                   </div>
@@ -288,8 +318,7 @@ const Dashboard = () => {
             :
             <div className="col-span-2 ml-6">
               <div className="mt-8">
-                <Chat room_id={"arn:aws:ivschat:us-east-1:670020256590:room/NWHYUr3g7k0p"} chat_token={
-                  "AQICAHgm5DC1V25pBVEhXdu--DOMvHAxl47LlIVxHqc_j6xXLgHKpyRTQjoS7GVb03scBQwdAAABqDCCAaQGCSqGSIb3DQEHBqCCAZUwggGRAgEAMIIBigYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAyRIMhAedyxwPNmZyICARCAggFbYv1u6GUkItiolsj5Uek0zwR1i4c7WXHOcQiQp3BnAFxPFVItA8-ePp1abiKR-Bv8SFHd10AXrdcMQd5n-_avGee8uSxvtN2UB1_LjSqgpMCIh8yHI6PHHcEzDLV7gAZDWkdu-hOmz-mWtOffr4OhPvZbeGzcT9G1uhaIg-QMr5Q7HWq6nX4b5cNiP8LUv--RfOR1kB1Jy8KOIUiIvPm2vJO8FGE4w_lPjjfRjy1fHOJfiTr3UiyGaaS88fOgD2do625T-Vq995Zx1RGw1PMczFbN9goCLrAkZqv63APNleA67C8dzh8GYskXWwMiownu10L4obw_O14MCz6Q8atcfcKopKbU2_VQJtmAqCiPJdeHF61lGWMyZTQTVihQnHp5hRK50NepEUDiXhI8azylJ8twyrRGq5qfwc6xnx-_ID8Qv_fX7Z1xlrxUeFMj-q1n63SQSbkngcdkl5k!#0"} s_exp={"2023-04-29T17:37:44+00:00"} t_exp={"2023-04-29T17:37:44+00:00"} />
+                <Chat room_id={room_id} chat_token={chat_token} s_exp={s_exp} t_exp={t_exp} user={user.attributes.email} />
               </div>
             </div>
         }
