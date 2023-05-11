@@ -30,10 +30,6 @@ const Dashboard = () => {
   const [s_exp, setSExp] = useState('');
   const [t_exp, setTExp] = useState('');
 
-  const sendInvitation = async (matchID) => {
-    return;
-  };
-
   const handleCheckboxChange = (e, userID) => {
     if (e.target.checked) {
       setSelectedUsers([...selectedUsers, userID]);
@@ -373,7 +369,7 @@ const Dashboard = () => {
             :
             <div className="col-span-2 ml-6">
               <div className="mt-8">
-                <Chat room_id={room_id} chat_token={chat_token} s_exp={s_exp} t_exp={t_exp} user={user.attributes.email} />
+                <Chat chat_token={chat_token} s_exp={s_exp} t_exp={t_exp} userID={user.username} userEmail={user.attributes.email}/>
               </div>
             </div>
         }
