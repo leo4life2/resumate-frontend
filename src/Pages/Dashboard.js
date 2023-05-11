@@ -22,6 +22,7 @@ const Dashboard = () => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [curChat, setCurChat] = useState('');
+  const [inviteButtonDisabled, setInviteButtonDisabled] = useState(false);
 
   // Tokens
   const [room_id, setRoomID] = useState('');
@@ -42,7 +43,58 @@ const Dashboard = () => {
   };
 
   const handleInviteButtonClick = async () => {
-    console.log(selectedUsers);
+    setInviteButtonDisabled(true);
+    // First Call LF8 to create a chatroom, and save ARN
+    // LF8 response JSON's `message` field is the ARN
+    let message; // Declare the variable outside the try block
+
+    try {
+      const res = await axios.post("https://jrn8nltaqj.execute-api.us-east-1.amazonaws.com/prod/chatroom/create", null, {
+        headers: {
+          Authorization: (await Auth.currentSession()).getIdToken().getJwtToken(),
+        },
+      });
+    
+      if (res.status !== 200) {
+        alert('Error creating chatroom');
+        console.log(res);
+        return;
+      } else {
+        console.log(res);
+        message = res.data.message; // Assign the value of the 'message' field
+      }
+    } catch (err) {
+      alert('Error creating chatroom');
+      console.log(err);
+    }
+
+    // Then Call LF5 to send invitations to selected users
+    const requestBody = {
+      chatroomARN: message, // Assuming 'message' is the chatroomARN from the previous API call
+      userIds: selectedUsers, // Assuming 'selectedUsers' is the array of userIds
+    };
+    
+    try {
+      const res = await axios.post("https://jrn8nltaqj.execute-api.us-east-1.amazonaws.com/prod/chatroom/invite", requestBody, {
+        headers: {
+          Authorization: (await Auth.currentSession()).getIdToken().getJwtToken(),
+          'Content-Type': 'application/json',
+        },
+      });
+    
+      if (res.status !== 200) {
+        alert('Error inviting users to chatroom');
+        console.log(res);
+        return;
+      } else {
+        console.log(res);
+        alert('Users invited successfully');
+      }
+    } catch (err) {
+      alert('Error inviting users to chatroom');
+      console.log(err);
+    }
+    setInviteButtonDisabled(false);
   };
 
   useEffect(() => {
@@ -293,8 +345,8 @@ const Dashboard = () => {
                     <div className="flex items-center">
                       <input
                         type="checkbox"
-                        checked={selectedUsers.includes(match.username)}
-                        onChange={(e) => handleCheckboxChange(e, match.username)}
+                        checked={selectedUsers.includes(match.userID)}
+                        onChange={(e) => handleCheckboxChange(e, match.userID)}
                         className="mr-4"
                       />
                       <div>
@@ -312,6 +364,7 @@ const Dashboard = () => {
                 <button
                   className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                   onClick={handleInviteButtonClick}
+                  disabled={inviteButtonDisabled}
                 >
                   Invite to Chat
                 </button>
