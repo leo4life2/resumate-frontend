@@ -67,13 +67,17 @@ const Chat = ({ chat_token, s_exp, t_exp, userID, userEmail }) => {
         >
           <p className="text-sm text-gray-800">{message.content}</p>
         </div>
+        <p className="text-xs text-gray-600">
+          {/* convert sendTime to string and display */}
+          {message.sendTime.toString().slice(4,24)}
+        </p>
       </div>
     );
   };
 
   const MessageList = ({ messages }) => {
     return (
-      <div className="h-[300px] overflow-y-auto mb-4">
+      <div className="h-[60vh] overflow-y-auto mb-4">
         {messages.map((message) => (
           <Message key={message.id} message={message} />
         ))}
@@ -113,7 +117,7 @@ const Chat = ({ chat_token, s_exp, t_exp, userID, userEmail }) => {
   }, []);
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="container mx-auto px-4 bg-white rounded-xl shadow-lg">
       <div className="flex flex-col p-10">
         <h4>Connection State: {connectionState}</h4>
         <MessageList messages={messages} />

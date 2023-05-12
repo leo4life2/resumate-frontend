@@ -50,7 +50,7 @@ const Dashboard = () => {
           Authorization: (await Auth.currentSession()).getIdToken().getJwtToken(),
         },
       });
-    
+
       if (res.status !== 200) {
         alert('Error creating chatroom');
         console.log(res);
@@ -69,7 +69,7 @@ const Dashboard = () => {
       chatroomARN: message, // Assuming 'message' is the chatroomARN from the previous API call
       userIds: selectedUsers, // Assuming 'selectedUsers' is the array of userIds
     };
-    
+
     try {
       const res = await axios.post("https://jrn8nltaqj.execute-api.us-east-1.amazonaws.com/prod/chatroom/invite", requestBody, {
         headers: {
@@ -77,7 +77,7 @@ const Dashboard = () => {
           'Content-Type': 'application/json',
         },
       });
-    
+
       if (res.status !== 200) {
         alert('Error inviting users to chatroom');
         console.log(res);
@@ -139,18 +139,18 @@ const Dashboard = () => {
         // Read the input PDF file
         const inputPdfBytes = await file.arrayBuffer();
         const inputPdfDoc = await PDFDocument.load(inputPdfBytes);
-  
+
         // Create a new PDF with only the first page
         const outputPdfDoc = await PDFDocument.create();
         const [firstPage] = await outputPdfDoc.copyPages(inputPdfDoc, [0]);
         outputPdfDoc.addPage(firstPage);
-  
+
         // Serialize the output PDF
         const outputPdfBytes = await outputPdfDoc.save();
-  
+
         // Convert the output PDF to a Blob object
         const trimmedFile = new Blob([outputPdfBytes], { type: 'application/pdf' });
-  
+
         const res = await axios.put("https://jrn8nltaqj.execute-api.us-east-1.amazonaws.com/prod/resumes", trimmedFile, {
           headers: {
             Authorization: (await Auth.currentSession()).getIdToken().getJwtToken(),
@@ -158,7 +158,7 @@ const Dashboard = () => {
             filename: user.attributes.email + '.pdf',
           },
         });
-  
+
         if (res.status !== 200) {
           alert('Error uploading file');
           console.log(res);
@@ -183,7 +183,7 @@ const Dashboard = () => {
       const res = await axios.get("https://jrn8nltaqj.execute-api.us-east-1.amazonaws.com/prod/chatroom/" + roomID, {
         headers: {
           Authorization: (await Auth.currentSession()).getIdToken().getJwtToken(),
-      }
+        }
       })
       if (res.status !== 200) {
         alert('Error getting tokens');
@@ -216,7 +216,11 @@ const Dashboard = () => {
       } else {
         console.log(res);
         setMatches(res.data.data);
-        alert('Matches retrieved successfully');
+        if (res.data.data.length === 0) {
+          alert('Right now, there are no matches for you. Please check back later or wait for automatic grouping.');
+        } else {
+          alert('Matches retrieved successfully');
+        }
       }
     } catch (err) {
       alert('Error getting matches');
@@ -267,15 +271,24 @@ const Dashboard = () => {
         <span className="text-xl font-semibold text-gray-700">
           Welcome, {user.attributes.email}
         </span>
-        <button
-          className="bg-indigo-600 text-white py-2 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300"
-          onClick={() => { signOut(); navigate("/") }}
-        >
-          Logout
-        </button>
-      </nav>
-      <div className="bg-white p-8 mt-8 mx-8 rounded-t-3xl shadow-lg grid grid-cols-3 flex-grow">
         <div>
+          <button
+            className="bg-green-400 text-white py-2 px-4 rounded-full focus:outline-none mr-2 focus:ring-2 focus:ring-indigo-300"
+            onClick={() => { navigate(0) }}
+          >
+            Reload
+          </button>
+          <button
+            className="bg-indigo-600 text-white py-2 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            onClick={() => { signOut(); navigate("/") }}
+          >
+            Logout
+          </button>
+        </div>
+
+      </nav>
+      <div className="bg-zinc-200 p-8 mt-8 mx-8 rounded-t-3xl shadow-lg grid grid-cols-3 flex-grow">
+        <div className='bg-white p-5 rounded-xl shadow-lg'>
           <h1 className="text-2xl font-bold mb-4">Resume Upload / Update</h1>
           <form onSubmit={handleSubmit} className="w-full max-w-md">
             <div
@@ -307,58 +320,78 @@ const Dashboard = () => {
               Upload / Update
             </button>
           </form>
+          {
+            curChat === '' ?
+              <div className="mt-8">
+                <h1 className="text-2xl font-bold mb-4">Your Chatrooms</h1>
 
-          <div className="mt-8">
-            <h1 className="text-2xl font-bold mb-4">Your Chatrooms</h1>
-
-            <div className="flex flex-col space-y-4">
-              {chatrooms.map((chatroom) => (
-                <div key={chatroom} className="p-4 border rounded shadow flex justify-between items-center cursor-pointer bg-blue-500 hover:shadow-lg hover:bg-blue-600" onClick={() => handleGetTokens(chatroom.split("/")[1])}>
-                  <div>
-                    <h3 className="text-lg font-bold text-white">Chatroom {chatroom.split("/")[1]}</h3>
-                  </div>
+                <div className="flex flex-col space-y-4">
+                  {chatrooms.map((chatroom) => (
+                    <div key={chatroom} className="p-4 border rounded shadow flex justify-between items-center cursor-pointer bg-blue-500 hover:shadow-lg hover:bg-blue-600" onClick={() => handleGetTokens(chatroom.split("/")[1])}>
+                      <div>
+                        <h3 className="text-lg font-bold text-white">Chatroom {chatroom.split("/")[1]}</h3>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+              :
+              <div className="bg-white mt-10 p-4 rounded-3xl shadow-lg flex-grow">
+                <h1 className="text-2xl font-bold">You are now in chatroom {curChat}</h1>
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4" onClick={() => navigate(0)}> Go Back </button>
+              </div>
+          }
         </div>
+
         {
           curChat === '' ?
-            <div className="col-span-2 ml-6">
-              <h1 className="text-2xl font-bold mb-4">Getting Matches</h1>
-              {
-                matches.length === 0 &&
-                <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  onClick={handleGetMatches}
-                >
-                  Get Matches
-                </button>
-              }
+            <div className="col-span-2 ml-6 text-center bg-white rounded-lg p-5">
+              <div className='mt-16'>
+                <h1 className="text-6xl font-bold mb-4">Getting Matches</h1>
+                {
+                  matches.length === 0 &&
+                  <button
+                    className="mt-10 bg-blue-500 hover:bg-blue-700 text-white text-3xl font-bold py-6 px-8 rounded focus:outline-none focus:shadow-outline"
+                    onClick={handleGetMatches}
+                  >
+                    Get Matches
+                  </button>
+                }
+              </div>
               <div>
                 {matches.map((match) => (
                   <div key={match.username} className="mt-4 p-4 border rounded shadow flex justify-between items-center">
-                    <div className="flex items-center">
+                    <div className="flex items-start flex-row">
                       <input
                         type="checkbox"
                         checked={selectedUsers.includes(match.userID)}
                         onChange={(e) => handleCheckboxChange(e, match.userID)}
-                        className="mr-4"
+                        className="mr-4 w-6 h-6"
                       />
-                      <div>
-                        <a href={`https://cc-proj-resume-bucket.s3.amazonaws.com/${match.username}.pdf`} target="_blank" rel="noopener noreferrer">
-                          <h1 className="text-xl font-bold underline text-blue-600">{match.username}</h1>
-                        </a>
-                        <p className="text-lg">Match Rate: {(match.score * 100).toFixed(2)} %</p>
+                      <div className="text-left flex-grow">
+                        <span className="text-2xl font-bold text-blue-600">{match.username}</span>
+                        <p className="text-xl">Match Rate: {(match.score * 100).toFixed(2)} %</p>
                       </div>
+                    </div>
+                    <div className="ml-auto">
+                      <a href={`https://cc-proj-resume-bucket.s3.amazonaws.com/${match.username}.pdf`} target="_blank" rel="noopener noreferrer">
+                        <button className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"> View Resume </button>
+                      </a>
                     </div>
                   </div>
                 ))}
+                {
+                  matches.length === 0 &&
+                  <div className="mt-10 flex justify-center items-center">
+                    <img src='https://images.pexels.com/photos/3184416/pexels-photo-3184416.jpeg?cs=srgb&dl=pexels-fauxels-3184416.jpg&fm=jpg' alt='no matches' className='h-[450px] rounded-lg' />
+                  </div>
+                }
               </div>
+
               {
                 selectedUsers.length > 0 &&
                 <button
-                  className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  className="mt-4 text-2xl bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded focus:outline-none focus:shadow-outline"
                   onClick={handleInviteButtonClick}
                   disabled={inviteButtonDisabled}
                 >
@@ -369,7 +402,7 @@ const Dashboard = () => {
             :
             <div className="col-span-2 ml-6">
               <div className="mt-8">
-                <Chat chat_token={chat_token} s_exp={s_exp} t_exp={t_exp} userID={user.username} userEmail={user.attributes.email}/>
+                <Chat chat_token={chat_token} s_exp={s_exp} t_exp={t_exp} userID={user.username} userEmail={user.attributes.email} />
               </div>
             </div>
         }
