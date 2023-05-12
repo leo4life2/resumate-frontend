@@ -22,6 +22,7 @@ const Dashboard = () => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [curChat, setCurChat] = useState('');
+  const [curChatName, setCurChatName] = useState('');
   const [inviteButtonDisabled, setInviteButtonDisabled] = useState(false);
 
   // Tokens
@@ -197,6 +198,7 @@ const Dashboard = () => {
         setSExp(res.data.s_exp);
         setTExp(res.data.t_exp);
         setCurChat(roomID);
+        setCurChatName(chatrooms[arn])
       }
     } catch (err) {
       alert('Error getting tokens');
@@ -343,7 +345,7 @@ const Dashboard = () => {
               </div>
               :
               <div className="bg-white mt-10 p-4 rounded-3xl shadow-lg flex-grow">
-                <h1 className="text-2xl font-bold">You are now in chatroom {chatrooms[curChat]}</h1>
+                <h1 className="text-2xl font-bold">You are now in chatroom {curChatName}</h1>
                 <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4" onClick={() => navigate(0)}> Go Back </button>
               </div>
           }
