@@ -402,7 +402,7 @@ const Dashboard = () => {
             :
             <div className="col-span-2 ml-6">
               <div className="mt-8">
-                <Chat chat_token={chat_token} s_exp={s_exp} t_exp={t_exp} userID={user.username} userEmail={user.attributes.email} />
+                <Chat room_id={curChat} chat_token={chat_token} s_exp={s_exp} t_exp={t_exp} userID={user.username} userEmail={user.attributes.email} />
               </div>
             </div>
         }

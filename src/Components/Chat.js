@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ChatRoom, SendMessageRequest } from 'amazon-ivs-chat-messaging';
+import axios from 'axios';
+import { Auth } from 'aws-amplify';
 
 
-const Chat = ({ chat_token, s_exp, t_exp, userID, userEmail }) => {
+const Chat = ({ room_id, chat_token, s_exp, t_exp, userID, userEmail }) => {
   const [messages, setMessages] = useState([]);
   const [messageToSend, setMessageToSend] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -52,7 +54,67 @@ const Chat = ({ chat_token, s_exp, t_exp, userID, userEmail }) => {
     );
   };
 
+  useEffect(() => {
+    if (room_id) {
+      try {
+        fetchMessageHistory();
+      } catch (error) {
+        console.log('Failed to fetch message history:', error);
+      }
+    }
+  }, [room_id]);
+  
+  function renameFields(obj) {
+    if (typeof obj !== 'object' || obj === null) {
+      return obj;
+    }
+  
+    if (Array.isArray(obj)) {
+      return obj.map(renameFields);
+    }
+  
+    const renamedObj = {};
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const newKey = key.charAt(0).toLowerCase() + key.slice(1);
+        renamedObj[newKey] = renameFields(obj[key]);
+      }
+    }
+  
+    return renamedObj;
+  }
+
+  const fetchMessageHistory = async () => {
+    try {
+      const res = await axios.get(`https://jrn8nltaqj.execute-api.us-east-1.amazonaws.com/prod/chatroom/history/${room_id}`, {
+        headers: {
+          Authorization: (await Auth.currentSession()).getIdToken().getJwtToken(),
+        },
+      });
+      if (res.status !== 200) {
+        console.log(res);
+        return;
+      } else {
+        console.log(res);
+        
+        // Parse the response data and update messages state
+        let parsedHistory = res.data.map((messageString) => JSON.parse(messageString).payload);
+        parsedHistory = parsedHistory.map((message) => renameFields(message));
+
+        console.log("parsed history is: ");
+        console.log(parsedHistory);
+        
+        setMessages(parsedHistory);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const Message = ({ message }) => {
+    console.log("message is: ");
+    console.log(message);
+
     const isMine = message.sender.userId === userID;
     console.log(message);
 
