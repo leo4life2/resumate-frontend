@@ -108,7 +108,20 @@ const Chat = ({ room_id, chat_token, s_exp, t_exp, userID, userEmail }) => {
         // Parse the response data and update messages state
         let parsedHistory = res.data.map((messageString) => JSON.parse(messageString).payload);
         parsedHistory = parsedHistory.map((message) => renameFields(message));
-
+        parsedHistory = parsedHistory.map((item) => {
+          const sendTime = new Date(item.sendTime);
+          const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+          };
+          const formattedSendTime = sendTime.toLocaleString('en-US', options);
+          return { ...item, sendTime: formattedSendTime };
+        });
+  
         console.log("parsed history is: ");
         console.log(parsedHistory);
         
@@ -139,7 +152,7 @@ const Chat = ({ room_id, chat_token, s_exp, t_exp, userID, userEmail }) => {
         </div>
         <p className="text-xs text-gray-600">
           {/* convert sendTime to string and display */}
-          {message.sendTime.toString().slice(4,24)}
+          {message.sendTime.toString()}
         </p>
       </div>
     );

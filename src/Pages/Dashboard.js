@@ -179,7 +179,8 @@ const Dashboard = () => {
     }
   };
 
-  const handleGetTokens = async (roomID) => {
+  const handleGetTokens = async (arn) => {
+    const roomID = arn.split("/")[1];
     try {
       const res = await axios.get("https://jrn8nltaqj.execute-api.us-east-1.amazonaws.com/prod/chatroom/" + roomID, {
         headers: {
@@ -327,18 +328,22 @@ const Dashboard = () => {
                 <h1 className="text-2xl font-bold mb-4">Your Chatrooms</h1>
 
                 <div className="flex flex-col space-y-4">
-                  {chatrooms.map((chatroom) => (
-                    <div key={chatroom} className="p-4 border rounded shadow flex justify-between items-center cursor-pointer bg-blue-500 hover:shadow-lg hover:bg-blue-600" onClick={() => handleGetTokens(chatroom.split("/")[1])}>
-                      <div>
-                        <h3 className="text-lg font-bold text-white">Chatroom {chatroom.split("/")[1]}</h3>
-                      </div>
+                {Object.keys(chatrooms).map((arn) => (
+                  <div
+                    key={arn}
+                    className="p-4 border rounded shadow flex justify-between items-center cursor-pointer bg-blue-500 hover:shadow-lg hover:bg-blue-600"
+                    onClick={() => handleGetTokens(arn)}
+                  >
+                    <div>
+                      <h3 className="text-lg font-bold text-white">Chatroom {chatrooms[arn]}</h3>
                     </div>
-                  ))}
+                  </div>
+                ))}
                 </div>
               </div>
               :
               <div className="bg-white mt-10 p-4 rounded-3xl shadow-lg flex-grow">
-                <h1 className="text-2xl font-bold">You are now in chatroom {curChat}</h1>
+                <h1 className="text-2xl font-bold">You are now in chatroom {chatrooms[curChat]}</h1>
                 <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4" onClick={() => navigate(0)}> Go Back </button>
               </div>
           }
