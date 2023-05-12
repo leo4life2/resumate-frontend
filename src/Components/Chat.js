@@ -141,16 +141,18 @@ const Chat = ({ room_id, chat_token, s_exp, t_exp, userID, userEmail }) => {
 
     return (
       <div className={`flex flex-col items-${isMine ? 'end' : 'start'} m-2`}>
-        <p className="text-xs text-gray-600">
+        <p className={`text-xs text-gray-600 ${isMine ? 'text-right' : ''}`}>
           {message.attributes.userEmail}
         </p>
-        <div
-          className={`${isMine ? 'bg-blue-200' : 'bg-gray-300'
-            } px-2 py-1 rounded-lg inline-block break-words`}
-        >
-          <p className="text-sm text-gray-800">{message.content}</p>
+        <div className={`inline-flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+          <div
+            className={`${isMine ? 'bg-blue-200' : 'bg-gray-300'
+              } px-2 py-1 rounded-lg inline-block break-words`}
+          >
+            <p className="text-sm text-gray-800">{message.content}</p>
+          </div>
         </div>
-        <p className="text-xs text-gray-600">
+        <p className={`text-xs text-gray-600 ${isMine ? 'text-right' : ''}`}>
           {/* convert sendTime to string and display */}
           {message.sendTime.toString()}
         </p>
