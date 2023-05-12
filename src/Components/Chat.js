@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChatRoom, SendMessageRequest } from 'amazon-ivs-chat-messaging';
 import axios from 'axios';
 import { Auth } from 'aws-amplify';
@@ -8,6 +8,14 @@ const Chat = ({ room_id, chat_token, s_exp, t_exp, userID, userEmail }) => {
   const [messages, setMessages] = useState([]);
   const [messageToSend, setMessageToSend] = useState('');
   const [isSending, setIsSending] = useState(false);
+
+  const inputRef = useRef(null);
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      onMessageSend();
+    }
+  };
 
   const [room] = useState(() =>
     new ChatRoom({
@@ -184,12 +192,18 @@ const Chat = ({ room_id, chat_token, s_exp, t_exp, userID, userEmail }) => {
         <h4>Connection State: {connectionState}</h4>
         <MessageList messages={messages} />
         <div className="flex flex-row w-full">
-          <input
-            type="text"
-            className="w-full bg-gray-100 border border-gray-300 p-3 rounded-full focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 focus:bg-white placeholder-gray-400"
-            placeholder="Type your message here..."
-            value={messageToSend}
-            onChange={(e) => setMessageToSend(e.target.value)}
+        <input
+          type="text"
+          className="w-full bg-gray-100 border border-gray-300 p-3 rounded-full focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 focus:bg-white placeholder-gray-400"
+          placeholder="Type your message here..."
+          value={messageToSend}
+          onChange={(e) => setMessageToSend(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              onMessageSend();
+            }
+          }}
           />
           <SendButton disabled={isSendDisabled} onPress={onMessageSend} />
         </div>
